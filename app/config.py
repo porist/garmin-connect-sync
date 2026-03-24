@@ -28,7 +28,12 @@ class Config:
 
     def _load(self):
         if not self.config_path.exists():
-            raise FileNotFoundError(f"Config file not found: {self.config_path}")
+            # 从模板复制
+            example_path = Path(__file__).parent.parent / "config.yaml.example"
+            if example_path.exists():
+                shutil.copy(example_path, self.config_path)
+            else:
+                raise FileNotFoundError(f"Config file not found: {self.config_path}")
 
         with open(self.config_path, "r", encoding="utf-8") as f:
             self._data = yaml.safe_load(f)
