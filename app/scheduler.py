@@ -1,5 +1,4 @@
 import logging
-import time
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 
@@ -73,7 +72,7 @@ class SyncScheduler:
                             splits = client.get_activity_splits(activity_id)
                             self.storage.save_activity_details(activity_id, details, splits)
                             details_fetched += 1
-                            time.sleep(0.5)  # 避免API限流
+                            # 限流由 client.rate_limiter 统一控制
                         except Exception as e:
                             logger.warning(f"获取详情失败 (ID: {activity_id}): {e}")
                             details_failed += 1

@@ -12,7 +12,6 @@ Usage:
 import argparse
 import logging
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 
@@ -35,21 +34,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def _fetch_single_activity_details(client, activity_id, max_retries=3):
-    """获取单个活动详情，支持重试"""
-    delays = [1, 5, 15]  # 指数退避
-    last_error = None
+def _fetch_single_activity_details(client, activity_id):
+    """获取单个活动详情
 
-    for attempt in range(max_retries):
-        try:
-            details = client.get_activity_details(activity_id)
-            splits = client.get_activity_splits(activity_id)
-            return details, splits
-        except Exception as e:
-            last_error = e
-            if attempt < max_retries - 1:
-                time.sleep(delays[attempt])
-    raise last_error
+    重试逻辑由 GarminClient 的装饰器和限流器统一处理。
+    """
+    details = client.get_activity_details(activity_id)
+    splits = client.get_activity_splits(activity_id)
+    return details, splits
 
 
 def sync_once(config: Config, storage: Storage, days: int = 7, fetch_details: bool = True):
