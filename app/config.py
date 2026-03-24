@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -9,8 +10,20 @@ class Config:
     _instance: Optional["Config"] = None
 
     def __init__(self, config_path: str = "config.yaml"):
-        self.config_path = Path(config_path)
+        self.config_path = self._resolve_config_path(config_path)
         self._load()
+
+    def _resolve_config_path(self, config_path: str) -> Path:
+        """Resolve config file path, handling PyInstaller bundle paths."""
+        p = Path(config_path)
+        if p.exists():
+            return p
+        # If running as PyInstaller bundle, check in _MEIPASS (internal folder)
+        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+            bundled_config = Path(sys._MEIPASS) / config_path
+            if bundled_config.exists():
+                return bundled_config
+        return p
 
     def _load(self):
         if not self.config_path.exists():

@@ -14,17 +14,13 @@ hiddenimports = [
     "garth.utils",
 ]
 
-# Also collect data files from garminconnect
-datas = [
-    ("config.yaml", "."),
-]
 binaries = []
 
 a = Analysis(
     ["app/main.py"],
     pathex=[],
     binaries=binaries,
-    datas=datas,
+    datas=[("config.yaml", ".")],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
