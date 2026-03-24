@@ -15,7 +15,9 @@ hiddenimports = [
 ]
 
 # Also collect data files from garminconnect
-datas = []
+datas = [
+    ("config.yaml", "."),
+]
 binaries = []
 
 a = Analysis(
