@@ -115,7 +115,6 @@ jobs:
         with:
           draft: false
           prerelease: false
-          generate_release_notes: true
           files: |
             release/garmin-macos.zip
             release/garmin-windows.zip
