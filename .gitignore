@@ -1,8 +1,16 @@
-.venv/
+# Build outputs
+dist/
+build/
+*.spec
+
+# Test directory
+test/
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 *.db
-.env
-*.xls
-CLAUDE.md
+
+# IDE
+.idea/
+.vscode/

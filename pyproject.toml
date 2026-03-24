@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "pyinstaller>=6.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "garmin-connect-sync"
+version = "1.0.0"
+description = "Garmin Connect data synchronization tool"
+requires-python = ">=3.10"
+dependencies = [
+    "garminconnect>=0.2.0",
+    "PyYAML>=6.0",
+    "APScheduler>=3.10.0",
+    "openpyxl>=3.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyinstaller>=6.0",
+    "pyinstaller-hooks-contrib>=2024.0",
+]
