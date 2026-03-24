@@ -96,10 +96,12 @@ class Config:
     def save(self):
         """保存配置到文件"""
         save_path = self.config_path
-        # 如果目标路径不可写（如在 _MEIPASS 打包目录中），写入到当前工作目录
-        if not os.access(save_path, os.W_OK):
+        # 如果运行在 PyInstaller bundle 中，或者目标路径不可写，则保存到当前工作目录
+        is_bundled = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+        if is_bundled or not os.access(save_path, os.W_OK):
             save_path = Path("config.yaml")
-            shutil.copy(self.config_path, save_path)
+            if self.config_path.exists():
+                shutil.copy(self.config_path, save_path)
             self.config_path = save_path
         with open(save_path, "w", encoding="utf-8") as f:
             yaml.dump(self._data, f, allow_unicode=True, default_flow_style=False)
