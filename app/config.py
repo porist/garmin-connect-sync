@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 from pathlib import Path
 from typing import Optional
@@ -94,7 +95,13 @@ class Config:
 
     def save(self):
         """保存配置到文件"""
-        with open(self.config_path, "w", encoding="utf-8") as f:
+        save_path = self.config_path
+        # 如果目标路径不可写（如在 _MEIPASS 打包目录中），写入到当前工作目录
+        if not os.access(save_path, os.W_OK):
+            save_path = Path("config.yaml")
+            shutil.copy(self.config_path, save_path)
+            self.config_path = save_path
+        with open(save_path, "w", encoding="utf-8") as f:
             yaml.dump(self._data, f, allow_unicode=True, default_flow_style=False)
 
     def get_all(self):
