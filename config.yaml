@@ -1,0 +1,8 @@
+database:
+  path: data/garmin.db
+garmin:
+  email: ""
+  password: ""
+  timeout: 30
+scheduler:
+  sync_interval_hours: 12

@@ -1,0 +1,68 @@
+#!/bin/bash
+# Garmin Connect CLI 工具
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+VENV_PYTHON="$SCRIPT_DIR/.venv/bin/python"
+APP_DIR="$SCRIPT_DIR/app"
+
+export PYTHONPATH="$SCRIPT_DIR"
+
+cmd="$1"
+shift
+
+case "$cmd" in
+    sync)
+        days="${1:-7}"
+        no_details=""
+        if [[ "$2" == "--no-details" ]]; then
+            no_details="--no-details"
+        fi
+        "$VENV_PYTHON" "$APP_DIR/main.py" --sync --days "$days" $no_details
+        ;;
+    daemon)
+        "$VENV_PYTHON" "$APP_DIR/main.py" --daemon "$@"
+        ;;
+    list)
+        limit="${1:-20}"
+        "$VENV_PYTHON" "$APP_DIR/main.py" --list --limit "$limit"
+        ;;
+    syncs)
+        "$VENV_PYTHON" "$APP_DIR/main.py" --list-syncs
+        ;;
+    detail)
+        activity_id="$1"
+        if [[ -z "$activity_id" ]]; then
+            echo "错误: 需要提供 activity_id"
+            echo "用法: garmin detail <activity_id>"
+            exit 1
+        fi
+        "$VENV_PYTHON" "$APP_DIR/main.py" --detail "$activity_id"
+        ;;
+    ping)
+        "$VENV_PYTHON" "$APP_DIR/main.py" --ping
+        ;;
+    config)
+        "$VENV_PYTHON" "$APP_DIR/main.py" --config-cmd "$@"
+        ;;
+    export)
+        output="${1:-activities.xls}"
+        "$VENV_PYTHON" "$APP_DIR/main.py" --export "$output"
+        ;;
+    help|--help|-h|"")
+        "$VENV_PYTHON" "$APP_DIR/main.py" --info
+        ;;
+    *)
+        echo "用法: garmin <命令> [参数]"
+        echo ""
+        echo "命令:"
+        echo "  sync [天数] [--no-details]   同步最近 N 天数据 (默认 7)"
+        echo "  daemon        启动定时同步守护进程"
+        echo "  list [数量]   列出最近 N 条活动 (默认 20)"
+        echo "  syncs         列出同步历史"
+        echo "  detail <id>   显示活动详情和圈数据"
+        echo "  ping          测试 API 连通性"
+        echo "  config [key [value]]  查看或修改配置"
+        echo "  export [文件名]  导出活动为 XLS 文件"
+        echo "  help          显示详细帮助"
+        ;;
+esac
