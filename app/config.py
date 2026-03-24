@@ -56,6 +56,26 @@ class Config:
         return self._data.get("garmin", {}).get("timeout", 10)
 
     @property
+    def garmin_token_file(self) -> Optional[str]:
+        """Token 文件路径，默认 ~/.garminconnect/token.json"""
+        return self._data.get("garmin", {}).get("token_file")
+
+    @property
+    def garmin_login_off_peak_only(self) -> bool:
+        """是否仅在非高峰时段登录"""
+        return self._data.get("garmin", {}).get("login_off_peak_only", False)
+
+    @property
+    def garmin_login_max_retries(self) -> int:
+        """登录最大重试次数"""
+        return self._data.get("garmin", {}).get("login_max_retries", 10)
+
+    @property
+    def garmin_login_initial_retry_delay(self) -> float:
+        """登录初始重试延迟（秒）"""
+        return self._data.get("garmin", {}).get("login_initial_retry_delay", 30.0)
+
+    @property
     def database_path(self) -> Path:
         db_path = self._data["database"]["path"]
         if not db_path.startswith("/"):
@@ -71,6 +91,43 @@ class Config:
     @property
     def cron_expression(self) -> Optional[str]:
         return self._data.get("scheduler", {}).get("cron")
+
+    # === Rate Limit 配置 ===
+
+    @property
+    def rate_limit_request_delay_seconds(self) -> float:
+        """请求间延迟（秒）"""
+        return self._data.get("rate_limit", {}).get("request_delay_seconds", 0.5)
+
+    @property
+    def rate_limit_max_retries(self) -> int:
+        """最大重试次数"""
+        return self._data.get("rate_limit", {}).get("max_retries", 5)
+
+    @property
+    def rate_limit_initial_retry_delay(self) -> float:
+        """初始重试延迟（秒）"""
+        return self._data.get("rate_limit", {}).get("initial_retry_delay", 1.0)
+
+    @property
+    def rate_limit_max_retry_delay(self) -> float:
+        """最大重试延迟（秒）"""
+        return self._data.get("rate_limit", {}).get("max_retry_delay", 300.0)
+
+    @property
+    def rate_limit_backoff_factor(self) -> float:
+        """退避因子"""
+        return self._data.get("rate_limit", {}).get("backoff_factor", 2.0)
+
+    @property
+    def rate_limit_jitter(self) -> bool:
+        """是否添加随机抖动"""
+        return self._data.get("rate_limit", {}).get("jitter", True)
+
+    @property
+    def rate_limit_off_peak_hours(self) -> list:
+        """避开的高峰时段（小时列表）"""
+        return self._data.get("rate_limit", {}).get("off_peak_hours", [])
 
     def get(self, key: str):
         """获取配置项，支持点号分隔的路径如 'garmin.email'"""
@@ -100,7 +157,7 @@ class Config:
         is_bundled = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
         if is_bundled or not os.access(save_path, os.W_OK):
             save_path = Path("config.yaml")
-            if self.config_path.exists():
+            if self.config_path.exists() and self.config_path.resolve() != save_path.resolve():
                 shutil.copy(self.config_path, save_path)
             self.config_path = save_path
         with open(save_path, "w", encoding="utf-8") as f:

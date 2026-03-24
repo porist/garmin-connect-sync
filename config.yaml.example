@@ -1,0 +1,25 @@
+database:
+  path: data/garmin.db
+
+garmin:
+  email: "your@email.com"
+  password: "your-password"
+  timeout: 30
+  # token_file: "~/.garminconnect/token.json"  # Token 持久化路径（可选）
+  # login_off_peak_only: false                 # 是否仅在非高峰时段登录（默认 false）
+  # login_max_retries: 10                     # 登录最大重试次数
+  # login_initial_retry_delay: 30             # 登录初始重试延迟（秒）
+
+scheduler:
+  sync_interval_hours: 12
+  # cron: "0 3 * * *"  # 或者使用 cron 表达式（分 时 日 月 周）
+
+# API 限流配置
+rate_limit:
+  request_delay_seconds: 0.5    # 请求间延迟（秒），即每秒最多 2 次请求
+  max_retries: 5                  # 最大重试次数
+  initial_retry_delay: 1.0       # 初始重试延迟（秒）
+  max_retry_delay: 300.0         # 最大重试延迟（秒）
+  backoff_factor: 2.0            # 退避因子
+  jitter: true                   # 是否添加随机抖动（推荐开启，避免雷群效应）
+  off_peak_hours: [2, 3, 4, 5]  # 非高峰时段（可选），在此时间段内可加快请求频率
